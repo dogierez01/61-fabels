@@ -77,24 +77,36 @@ const stations = [
     {file:"61_WoodcutterTrees.mp3", title:"61. The Woodcutter and the Trees"}
 ];
 
-stations.forEach((s, i) => {
-    const btn = document.createElement('div'); btn.className = 'station-tile';
-    if(completedLessons.includes(s.file)) btn.classList.add('completed');
-    btn.innerHTML = `<b>${i + 1}</b> ${s.title.replace(/^\d+\.\s*/, "")}`;
-    btn.onclick = () => { 
-        grid.classList.add('hidden'); playerZone.classList.remove('hidden'); 
-        document.getElementById('now-playing-title').innerText = s.title; 
-        audio.src = s.file; wordBucket = []; 
-    };
-    grid.appendChild(btn);
-});
+function renderGrid() {
+    grid.innerHTML = "";
+    stations.forEach((s, i) => {
+        const btn = document.createElement('div'); btn.className = 'station-tile';
+        if(completedLessons.includes(s.file)) btn.classList.add('completed');
+        btn.innerHTML = `<b>${i + 1}</b> ${s.title.replace(/^\d+\.\s*/, "")}`;
+        btn.onclick = () => { 
+            grid.classList.add('hidden'); playerZone.classList.remove('hidden'); 
+            document.getElementById('now-playing-title').innerText = s.title; 
+            audio.src = s.file; wordBucket = []; 
+        };
+        grid.appendChild(btn);
+    });
+}
+renderGrid();
 
-// --- OPTION B: COMIC FILENAME LOGIC ---
+// --- BACK BUTTON FIX (NO RELOAD) ---
+document.getElementById('btn-back').onclick = () => {
+    audio.pause(); audio.currentTime = 0;
+    playerZone.classList.add('hidden');
+    transcript.classList.add('hidden');
+    gameZone.classList.add('hidden');
+    grid.classList.remove('hidden');
+    currentQ = 0; attempts = 0;
+};
+
 document.getElementById('btn-comic').onclick = () => {
     const currentFile = audio.src.split('/').pop();
     const station = stations.find(s => s.file === decodeURIComponent(currentFile));
     if (station) {
-        // Strips "1. " from "1. The Bat in the War" to get "The Bat in the War.png"
         const imageName = station.title.replace(/^\d+\.\s*/, "") + ".png";
         comicImg.src = imageName;
         comicModal.classList.remove('hidden');
@@ -104,13 +116,8 @@ document.getElementById('btn-comic').onclick = () => {
 
 modalClose.onclick = () => { comicModal.classList.add('hidden'); };
 
-// --- PINCH-TO-ZOOM ENGINE ---
 let scale = 1, lastScale = 1, startDist = 0;
-zoomContainer.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-        startDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
-    }
-});
+zoomContainer.addEventListener('touchstart', (e) => { if (e.touches.length === 2) startDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY); });
 zoomContainer.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2) {
         e.preventDefault();
@@ -124,7 +131,6 @@ function resetZoom() { scale = 1; lastScale = 1; comicImg.style.transform = `sca
 
 document.getElementById('btn-start').onclick = () => { splash.classList.add('hidden'); instr.classList.remove('hidden'); };
 document.getElementById('btn-enter').onclick = () => { instr.classList.add('hidden'); app.classList.remove('hidden'); };
-document.getElementById('btn-back').onclick = () => { location.reload(); };
 
 document.getElementById('ctrl-play').onclick = () => audio.play();
 document.getElementById('ctrl-pause').onclick = () => audio.pause();
@@ -132,7 +138,6 @@ document.getElementById('ctrl-stop').onclick = () => { audio.pause(); audio.curr
 document.getElementById('btn-blind').onclick = () => { transcript.classList.add('hidden'); gameZone.classList.add('hidden'); audio.play(); };
 
 document.getElementById('btn-read').onclick = () => {
-    if (typeof lessonData === 'undefined') { alert("🚨 Error: data.js failed!"); return; }
     let fn = decodeURIComponent(audio.src.split('/').pop()); 
     const data = lessonData[fn][0];
     transcript.classList.remove('hidden'); gameZone.classList.add('hidden'); transcript.innerHTML = "";
@@ -249,6 +254,14 @@ function showResult(isCorrect, msg, qData, lesson, canRetry = false) {
 function finishQuiz() {
     lifetimeScore += totalScore; localStorage.setItem('fablesScore', lifetimeScore);
     const fn = decodeURIComponent(audio.src.split('/').pop());
-    if(!completedLessons.includes(fn)) { completedLessons.push(fn); localStorage.setItem('completedFablesLessons', JSON.stringify(completedLessons)); }
-    feedbackArea.innerHTML = `<h1 style="color:#ccff00; font-size: 60px;">FINISHED!</h1><h2 style="font-size: 40px;">QUIZ SCORE: ${totalScore}</h2><button onclick="location.reload()" class="action-btn-large">SAVE & RETURN</button>`;
+    if(!completedLessons.includes(fn)) { 
+        completedLessons.push(fn); 
+        localStorage.setItem('completedFablesLessons', JSON.stringify(completedLessons)); 
+    }
+    renderGrid(); // Refresh grid to show checkmark
+    feedbackArea.innerHTML = `<h1 style="color:#ccff00; font-size: 60px;">FINISHED!</h1><h2 style="font-size: 40px;">QUIZ SCORE: ${totalScore}</h2><button id="btn-done" class="action-btn-large">SAVE & RETURN</button>`;
+    document.getElementById('btn-done').onclick = () => {
+        playerZone.classList.add('hidden');
+        grid.classList.remove('hidden');
+    };
 }
