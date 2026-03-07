@@ -3,7 +3,9 @@ const splash = document.getElementById('splash-screen'), instr = document.getEle
       playerZone = document.getElementById('player-zone'), audio = document.getElementById('audio-player'),
       transcript = document.getElementById('transcript-box'), popup = document.getElementById('translation-popup'),
       gameZone = document.getElementById('game-zone'), gameBoard = document.getElementById('game-board'),
-      feedbackArea = document.getElementById('quiz-feedback-area'), ptsVal = document.getElementById('points-val');
+      feedbackArea = document.getElementById('quiz-feedback-area'), ptsVal = document.getElementById('points-val'),
+      comicModal = document.getElementById('comic-modal'), comicImg = document.getElementById('comic-img'),
+      modalClose = document.getElementById('modal-close'), zoomContainer = document.getElementById('zoom-container');
 
 let lifetimeScore = parseInt(localStorage.getItem('fablesScore')) || 0;
 let completedLessons = JSON.parse(localStorage.getItem('completedFablesLessons')) || [];
@@ -78,7 +80,7 @@ const stations = [
 stations.forEach((s, i) => {
     const btn = document.createElement('div'); btn.className = 'station-tile';
     if(completedLessons.includes(s.file)) btn.classList.add('completed');
-    btn.innerHTML = `<b>${i + 1}</b> ${s.title}`;
+    btn.innerHTML = `<b>${i + 1}</b> ${s.title.replace(/^\d+\.\s*/, "")}`;
     btn.onclick = () => { 
         grid.classList.add('hidden'); playerZone.classList.remove('hidden'); 
         document.getElementById('now-playing-title').innerText = s.title; 
@@ -86,6 +88,39 @@ stations.forEach((s, i) => {
     };
     grid.appendChild(btn);
 });
+
+// --- OPTION B: COMIC FILENAME LOGIC ---
+document.getElementById('btn-comic').onclick = () => {
+    const currentFile = audio.src.split('/').pop();
+    const station = stations.find(s => s.file === decodeURIComponent(currentFile));
+    if (station) {
+        // Strips "1. " from "1. The Bat in the War" to get "The Bat in the War.png"
+        const imageName = station.title.replace(/^\d+\.\s*/, "") + ".png";
+        comicImg.src = imageName;
+        comicModal.classList.remove('hidden');
+        resetZoom();
+    }
+};
+
+modalClose.onclick = () => { comicModal.classList.add('hidden'); };
+
+// --- PINCH-TO-ZOOM ENGINE ---
+let scale = 1, lastScale = 1, startDist = 0;
+zoomContainer.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+        startDist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+    }
+});
+zoomContainer.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+        e.preventDefault();
+        let dist = Math.hypot(e.touches[0].pageX - e.touches[1].pageX, e.touches[0].pageY - e.touches[1].pageY);
+        scale = Math.min(Math.max(1, lastScale * (dist / startDist)), 4);
+        comicImg.style.transform = `scale(${scale})`;
+    }
+});
+zoomContainer.addEventListener('touchend', () => { lastScale = scale; });
+function resetZoom() { scale = 1; lastScale = 1; comicImg.style.transform = `scale(1)`; }
 
 document.getElementById('btn-start').onclick = () => { splash.classList.add('hidden'); instr.classList.remove('hidden'); };
 document.getElementById('btn-enter').onclick = () => { instr.classList.add('hidden'); app.classList.remove('hidden'); };
@@ -97,10 +132,8 @@ document.getElementById('ctrl-stop').onclick = () => { audio.pause(); audio.curr
 document.getElementById('btn-blind').onclick = () => { transcript.classList.add('hidden'); gameZone.classList.add('hidden'); audio.play(); };
 
 document.getElementById('btn-read').onclick = () => {
-    if (typeof lessonData === 'undefined') { alert("🚨 Error: data.js failed to load!"); return; }
+    if (typeof lessonData === 'undefined') { alert("🚨 Error: data.js failed!"); return; }
     let fn = decodeURIComponent(audio.src.split('/').pop()); 
-    if(!lessonData[fn]) { alert("🚨 Error: Missing text for " + fn); return; }
-    
     const data = lessonData[fn][0];
     transcript.classList.remove('hidden'); gameZone.classList.add('hidden'); transcript.innerHTML = "";
     data.text.split(" ").forEach(w => {
@@ -158,7 +191,6 @@ function runQuiz(lesson) {
     if (currentQ >= 7) { finishQuiz(); return; }
     const qData = lesson.questions[currentQ];
     const storyNum = parseInt(decodeURIComponent(audio.src.split('/').pop()).substring(0,2));
-    
     feedbackArea.innerHTML = `
         <div id="quiz-container">
             <div class="score-badge">SCORE: ${totalScore} | Q: ${currentQ+1}/7</div>
@@ -169,30 +201,21 @@ function runQuiz(lesson) {
             </div>
             <div id="res-area"></div>
         </div>`;
-
     document.getElementById('btn-hear-q').onclick = () => {
         const utter = new SpeechSynthesisUtterance(qData.q);
-        utter.lang = 'en-US'; // Forces English pronunciation for students on Turkish devices
+        utter.lang = 'en-US';
         const voices = window.speechSynthesis.getVoices();
         if (voices.length > 0) {
-            let selectedVoice;
-            if (storyNum % 2 !== 0) { // ODD stories = Neural2-F (Female fallback)
-                selectedVoice = voices.find(v => (v.name.includes("Female") || v.name.includes("Zira") || v.name.includes("Google US English")) && v.lang.startsWith('en'));
-            } else { // EVEN stories = Neural2-D (Male fallback)
-                selectedVoice = voices.find(v => (v.name.includes("Male") || v.name.includes("David")) && v.lang.startsWith('en'));
-            }
-            utter.voice = selectedVoice || voices.find(v => v.lang.startsWith('en')) || voices[0];
+            let v = voices.find(v => (v.name.includes(storyNum % 2 !== 0 ? "Female" : "Male")) && v.lang.startsWith('en'));
+            utter.voice = v || voices.find(v => v.lang.startsWith('en')) || voices[0];
         }
         utter.onend = () => { document.getElementById('mic-box').classList.remove('hidden'); };
         window.speechSynthesis.speak(utter);
     };
-
     document.getElementById('btn-speak').onclick = function() {
         const btn = this; const status = document.getElementById('mic-status');
-        if (window.currentRec) { window.currentRec.abort(); }
         window.currentRec = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
         window.currentRec.lang = 'en-US';
-        window.currentRec.interimResults = false;
         window.currentRec.onstart = () => { btn.classList.add('active'); status.innerText = "Listening..."; };
         window.currentRec.onresult = (e) => {
             document.getElementById('mic-box').classList.add('hidden'); 
@@ -203,11 +226,10 @@ function runQuiz(lesson) {
                 showResult(true, pts === 20 ? "STRIKE! (+20)" : "SPARE! (+15)", qData, lesson);
             } else {
                 attempts++;
-                if (attempts === 1) { showResult(false, "MISS! TRY AGAIN", qData, lesson, true); }
-                else { showResult(false, "MISS! (0 pts)", qData, lesson, false); }
+                if (attempts === 1) showResult(false, "MISS! TRY AGAIN", qData, lesson, true);
+                else showResult(false, "MISS! (0 pts)", qData, lesson, false);
             }
         };
-        window.currentRec.onerror = () => { btn.classList.remove('active'); status.innerText = "Error. Try again."; };
         window.currentRec.start();
     };
 }
@@ -216,27 +238,17 @@ function showResult(isCorrect, msg, qData, lesson, canRetry = false) {
     const area = document.getElementById('res-area');
     area.innerHTML = `<h1 style="color:${isCorrect?'#39ff14':'#f44'}; font-size: 50px;">${msg}</h1>`;
     if (isCorrect || !canRetry) {
-        area.innerHTML += `
-            <p class="quiz-q-text">Q: ${qData.q}</p>
-            <p class="quiz-a-text">EN: ${qData.a_en}</p>
-            <p style="color:#888; font-size:30px; font-weight: bold;">TR: ${qData.a_tr}</p>
-            <button id="btn-nxt" class="action-btn-large" style="margin-top:30px;">NEXT QUESTION ⮕</button>`;
+        area.innerHTML += `<p class="quiz-q-text">Q: ${qData.q}</p><p class="quiz-a-text">EN: ${qData.a_en}</p><p style="color:#888; font-size:30px; font-weight: bold;">TR: ${qData.a_tr}</p><button id="btn-nxt" class="action-btn-large">NEXT QUESTION ⮕</button>`;
         document.getElementById('btn-nxt').onclick = () => { currentQ++; attempts = 0; runQuiz(lesson); };
     } else {
-        area.innerHTML += `<button id="btn-retry" class="action-btn-large" style="margin-top:30px;">RETRY FOR SPARE</button>`;
-        document.getElementById('btn-retry').onclick = () => {
-            area.innerHTML = ""; document.getElementById('mic-box').classList.remove('hidden');
-            document.getElementById('btn-speak').classList.remove('active');
-            document.getElementById('mic-status').innerText = "Ready for Spare...";
-        };
+        area.innerHTML += `<button id="btn-retry" class="action-btn-large">RETRY FOR SPARE</button>`;
+        document.getElementById('btn-retry').onclick = () => { area.innerHTML = ""; document.getElementById('mic-box').classList.remove('hidden'); document.getElementById('btn-speak').classList.remove('active'); };
     }
 }
 
 function finishQuiz() {
     lifetimeScore += totalScore; localStorage.setItem('fablesScore', lifetimeScore);
     const fn = decodeURIComponent(audio.src.split('/').pop());
-    if(!completedLessons.includes(fn)) {
-        completedLessons.push(fn); localStorage.setItem('completedFablesLessons', JSON.stringify(completedLessons));
-    }
+    if(!completedLessons.includes(fn)) { completedLessons.push(fn); localStorage.setItem('completedFablesLessons', JSON.stringify(completedLessons)); }
     feedbackArea.innerHTML = `<h1 style="color:#ccff00; font-size: 60px;">FINISHED!</h1><h2 style="font-size: 40px;">QUIZ SCORE: ${totalScore}</h2><button onclick="location.reload()" class="action-btn-large">SAVE & RETURN</button>`;
 }
