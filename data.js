@@ -1,3 +1,67 @@
+const stations = [
+    {file:"01_BatInWar.mp3", title:"1. The Bat in the War"},
+    {file:"02_BearChipmunk.mp3", title:"2. The Bear and the Chipmunk"},
+    {file:"03_BearTwoFriends.mp3", title:"3. The Bear and the Two Friends"},
+    {file:"04_BoyRattlesnake.mp3", title:"4. The Boy and the Rattlesnake"},
+    {file:"05_ButterflyMonk.mp3", title:"5. The Butterfly and the Kind Monk"},
+    {file:"06_CamelThistle.mp3", title:"6. The Camel and the Thistle"},
+    {file:"07_CamelTent.mp3", title:"7. The Camel in the Tent", image: "The Camel and the Tent.png"},
+    {file:"08_CatFox.mp3", title:"8. The Cat and the Fox"},
+    {file:"09_CrowPeacock.mp3", title:"9. The Crow and the Peacock", image: "The Crow and the peacock.png"},
+    {file:"10_DeerAntlers.mp3", title:"10. The Deer and His Antlers"},
+    {file:"11_DogReflection.mp3", title:"11. The Dog and His Reflection"},
+    {file:"12_DogWolf.mp3", title:"12. The Dog and the Wolf"},
+    {file:"13_DogManger.mp3", title:"13. The Dog in the Manger"},
+    {file:"14_DonkeyLapdog.mp3", title:"14. The Donkey and the Lapdog"},
+    {file:"15_DonkeySalt.mp3", title:"15. The Donkey and the Salt"},
+    {file:"16_EagleArrow.mp3", title:"16. The Eagle and the Arrow"},
+    {file:"17_EagleBeetle.mp3", title:"17. The Eagle and the Beetle"},
+    {file:"18_EagleChicken.mp3", title:"18. The Eagle Who Thought He Was a Chicken"},
+    {file:"19_ElephantRope.mp3", title:"19. The Elephant and the Rope"},
+    {file:"20_FalconKing.mp3", title:"20. The Falcon and the King"},
+    {file:"21_FoxStork.mp3", title:"21. The Fox and the Stork"},
+    {file:"22_FoxTraitorRooster.mp3", title:"22. The Fox and the Traitor Rooster"},
+    {file:"23_FrogsWantedKing.mp3", title:"23. The Frogs Who Wanted a King"},
+    {file:"24_GooseGoldenEggs.mp3", title:"24. The Goose and the Golden Eggs"},
+    {file:"25_HeronFish.mp3", title:"25. The Heron and the Fish"},
+    {file:"26_HorseLoadedDonkey.mp3", title:"26. The Horse and the Loaded Donkey"},
+    {file:"27_HorseStagRider.mp3", title:"27. The Horse, the Stag, and the Rider"},
+    {file:"28_LazySwallow.mp3", title:"28. The Lazy Swallow and the Winter"},
+    {file:"29_LionCleverRabbit.mp3", title:"29. The Lion and the Clever Rabbit"},
+    {file:"30_LionMouse.mp3", title:"30. The Lion and the Mouse"},
+    {file:"31_LionPainting.mp3", title:"31. The Lion and the Painting"},
+    {file:"32_LionDonkeyFox.mp3", title:"32. The Lion, the Donkey, and the Fox"},
+    {file:"33_LionsDividedHerd.mp3", title:"33. The Lions and the Divided Herd"},
+    {file:"34_LittleBirdCow.mp3", title:"34. The Little Bird and the Cow"},
+    {file:"35_MiceWantedBell.mp3", title:"35. The Mice Who Wanted a Bell"},
+    {file:"36_MonkeyCrocodile.mp3", title:"36. The Monkey and the Crocodile"},
+    {file:"37_MouseFrogHawk.mp3", title:"37. The Mouse, the Frog, and the Hawk"},
+    {file:"38_NightingaleHawk.mp3", title:"38. The Nightingale and the Hawk"},
+    {file:"39_OakTreeReed.mp3", title:"39. The Oak Tree and the Reed"},
+    {file:"40_OldDogHole.mp3", title:"40. The Old Dog and the Hole"},
+    {file:"41_OldLionFootprints.mp3", title:"41. The Old Lion and the Footprints"},
+    {file:"42_OldManScorpion.mp3", title:"42. The Old Man and the Scorpion"},
+    {file:"43_PeacockCrane.mp3", title:"43. The Peacock and the Crane"},
+    {file:"44_WomanMongoose.mp3", title:"44. The Peasant Woman and the Mongoose"},
+    {file:"45_PeasantSnake.mp3", title:"45. The Peasant and the Snake"},
+    {file:"46_ScorpionFrog.mp3", title:"46. The Scorpion and the Frog"},
+    {file:"47_ElephantNoise.mp3", title:"47. The Silent Elephant and the Noise"},
+    {file:"48_SnakeFile.mp3", title:"48. The Snake and the Steel File"},
+    {file:"49_SpiderFly.mp3", title:"49. The Spider and the Flattered Fly"},
+    {file:"50_TigerFox.mp3", title:"50. The Tiger and the Smart Fox"},
+    {file:"51_TigerWoodpecker.mp3", title:"51. The Tiger and the Woodpecker"},
+    {file:"52_TurtleScorpion.mp3", title:"52. The Turtle and the Scorpion"},
+    {file:"53_TurtleGeese.mp3", title:"53. The Turtle and the Two Geese"},
+    {file:"54_TwoDogs.mp3", title:"54. The Two Dogs"},
+    {file:"55_TwoFrogsMilk.mp3", title:"55. The Two Frogs and the Milk"},
+    {file:"56_RoostersEagle.mp3", title:"56. The Two Roosters and the Eagle"},
+    {file:"57_TwoSeeds.mp3", title:"57. The Two Seeds"},
+    {file:"58_WarriorWolf.mp3", title:"58. The Warrior and the Loyal Wolf"},
+    {file:"59_WolfLamb.mp3", title:"59. The Wolf and the Lamb"},
+    {file:"60_WolfSheep.mp3", title:"60. The Wolf in Sheep’s Clothing", image: "The Wolf in Sheep's Clothing.png"},
+    {file:"61_WoodcutterTrees.mp3", title:"61. The Woodcutter and the Trees"}
+];
+
 const lessonData = {};
 
 lessonData["01_BatInWar.mp3"] = [{
@@ -118,7 +182,9 @@ lessonData["20_FalconKing.mp3"] = [{
     text: "The Falcon and the King. A powerful King had a favorite hunting falcon. One hot summer day, the King went hunting in the dry forest. He became very thirsty and found a small stream of water dripping from a rock. He filled his golden cup slowly. Just as he was about to drink, the falcon flew down and knocked the cup out of his hand. The King filled the cup again, but again, the falcon attacked it. The third time, the King was so angry that he killed the falcon with his sword. As the bird died, the King looked up at the top of the rock. He saw a huge, dead poisonous snake lying in the water source. The water was toxic! The falcon was trying to save his master’s life. The King cried in deep sadness, but it was too late.",
     dict: { "powerful": "güçlü", "hunting falcon": "avcı doğanı", "thirsty": "susamış", "stream": "dere", "dripping": "damlayan", "golden cup": "altın kupa", "knocked": "vurdu/devirdi", "attacked": "saldırdı", "sword": "kılıç", "poisonous snake": "zehirli yılan", "water source": "su kaynağı", "toxic": "zehirli", "save": "kurtarmak", "deep sadness": "derin üzüntü" },
     questions: [ {q:"Did the King have a favorite falcon?", a_en:"Yes", a_tr:"Evet"}, {q:"Was the King very thirsty?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the falcon knock the cup out of his hand?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the King kill the falcon in anger?", a_en:"Yes", a_tr:"Evet"}, {q:"Was the water safe to drink?", a_en:"No", a_tr:"Hayır"}, {q:"Was there a dead poisonous snake in the water?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the falcon try to save the King's life?", a_en:"Yes", a_tr:"Evet"} ]
-}];lessonData["21_FoxStork.mp3"] = [{
+}];
+
+lessonData["21_FoxStork.mp3"] = [{
     text: "The Fox and the Stork. A clever fox invited a tall stork to dinner. The fox prepared delicious soup, but he served it on a very flat, shallow plate. The fox quickly licked up the soup, but the stork could eat nothing because her beak was too long. The cruel fox just laughed. The next day, the stork invited the fox for dinner. She prepared wonderful meat, but she served it inside a tall, thin glass jar. The stork ate easily by putting her long beak inside, but the fox found no way to fit his wide head into the jar. The fox had to go home completely hungry and embarrassed.",
     dict: { "invited": "davet etti", "prepared": "hazırladı", "served": "servis etti", "flat": "düz", "shallow": "sığ", "plate": "tabak", "licked up": "yaladı", "beak": "gaga", "cruel": "zalim", "meat": "et", "glass jar": "cam kavanoz", "fit": "sığmak", "wide": "geniş", "head": "kafa", "embarrassed": "utanmış" },
     questions: [ {q:"Did the fox serve soup on a flat plate?", a_en:"Yes", a_tr:"Evet"}, {q:"Could the stork eat from the flat plate?", a_en:"No", a_tr:"Hayır"}, {q:"Did the fox laugh at the stork?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the stork invite the fox the next day?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the stork serve meat in a tall jar?", a_en:"Yes", a_tr:"Evet"}, {q:"Could the fox fit his head into the jar?", a_en:"No", a_tr:"Hayır"}, {q:"Did the fox go home hungry?", a_en:"Yes", a_tr:"Evet"} ]
@@ -217,7 +283,7 @@ lessonData["36_MonkeyCrocodile.mp3"] = [{
 lessonData["37_MouseFrogHawk.mp3"] = [{
     text: "The Mouse, the Frog, and the Hawk. A field mouse and a frog were friends. One day, the playful frog tied the mouse's foot to his own leg with a piece of grass. They walked together looking for food. Suddenly, the frog jumped into a deep pond. The frog loved the water, but the mouse found no way to swim and drowned. The dead mouse's body floated to the top, still tied to the frog. A hungry hawk saw the dead mouse, flew down, and grabbed it. Because the frog was tied to the mouse, the hawk easily pulled the frog out of the water too, and ate them both.",
     dict: { "field mouse": "tarla faresi", "tied": "bağladı", "foot": "ayak", "piece": "parça", "grass": "ot", "pond": "gölet", "drowned": "boğuldu", "floated": "yüzdü (su üstünde)", "hawk": "şahin/atmaca", "both": "her ikisi" },
-    questions: [ {q:"Did the frog tie the mouse's foot?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the frog jump into a pond?", a_en:"Yes", a_tr:"Evet"}, {q:"Could the mouse swim?", a_en:"No", a_tr:"Hayır"}, {q:"Did the mouse drown?", a_en:"Yes", a_tr:"Evet"}, {q:"Did a hawk see the dead mouse?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the hawk grab only the mouse?", a_en:"No", a_tr:"Hayır"}, {q:"Did the hawk eat both of them?", a_en:"Yes", a_tr:"Evet"} ]
+    questions: [ {q:"Did the frog tie the mouse's foot?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the frog jump into a pond?", a_en:"Yes", a_tr:"Evet"}, {q:"Could the mouse swim?", a_en:"No", a_tr:"Hayır"}, {q:"Did the mouse drown?", a_en:"Yes", a_tr:"Evet"}, {q:"Did a hawk saw the dead mouse?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the hawk grab only the mouse?", a_en:"No", a_tr:"Hayır"}, {q:"Did the hawk eat both of them?", a_en:"Yes", a_tr:"Evet"} ]
 }];
 
 lessonData["38_NightingaleHawk.mp3"] = [{
@@ -236,7 +302,9 @@ lessonData["40_OldDogHole.mp3"] = [{
     text: "The Old Dog and the Hole. An old farm dog fell into a deep, dry hole. The farmer thought the dog was too old to save, so he decided to bury the dog there. He began to throw dirt into the hole. When the first shovel of dirt hit the dog's back, it was terrified. But then, the dog had a smart idea. Every time dirt landed on him, he would shake it off and step on top of it. Slowly, the pile of dirt grew higher. Finally, the dog reached the top of the hole and jumped out. The farmer was amazed that the dirt he used to bury the dog was actually what saved him.",
     dict: { "dry hole": "kuru delik/çukur", "bury": "gömmek", "throw": "atmak", "shovel": "kürek", "shake it off": "silkelemek", "step on top": "üzerine basmak", "amazed": "hayret etmiş" },
     questions: [ {q:"Did the old dog fall into a hole?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the farmer try to save the dog at first?", a_en:"No", a_tr:"Hayır"}, {q:"Did the farmer throw dirt on the dog?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the dog shake the dirt off?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the dog step on top of the dirt?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the dog reach the top of the hole?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the dirt save the dog's life?", a_en:"Yes", a_tr:"Evet"} ]
-}];lessonData["41_OldLionFootprints.mp3"] = [{
+}];
+
+lessonData["41_OldLionFootprints.mp3"] = [{
     text: "The Old Lion and the Footprints. An old, weak lion could hunt no longer, so he made a plan. He went into his dark cave and pretended to be very sick. Many animals felt sorry for the king and went inside to visit him. As soon as they entered, the lion ate them. A smart fox stayed outside safely. He called out, 'How are you feeling today, King?' The lion answered, 'I am very sick. Please, come inside.' The fox looked at the ground and smiled. 'No, thank you', the fox said. 'I can see many footprints going into your cave, but I see footprints coming out at no point.'",
     dict: { "weak": "zayıf/güçsüz", "hunt no longer": "artık avlanamamak", "cave": "mağara", "pretended": "numara yaptı", "sick": "hasta", "inside": "içeri/içeride", "visit": "ziyaret etmek", "entered": "girdiler", "ate": "yedi", "safely": "güvenli bir şekilde", "called out": "seslendi", "ground": "yer/zemin", "footprints": "ayak izleri", "at no point": "hiçbir zaman/noktada" },
     questions: [ {q:"Could the old lion hunt any longer?", a_en:"No", a_tr:"Hayır"}, {q:"Did the lion pretend to be sick?", a_en:"Yes", a_tr:"Evet"}, {q:"Did many animals visit the lion in his cave?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the lion eat the animals that entered?", a_en:"Yes", a_tr:"Evet"}, {q:"Did the smart fox go inside the cave?", a_en:"No", a_tr:"Hayır"}, {q:"Did the fox see any footprints coming out of the cave?", a_en:"No", a_tr:"Hayır"}, {q:"Did the fox see footprints coming out at no point?", a_en:"Yes", a_tr:"Evet"} ]
