@@ -13,70 +13,6 @@ if(ptsVal) ptsVal.innerText = lifetimeScore;
 
 let wordBucket = []; let currentQ = 0; let attempts = 0; let totalScore = 0; let firstCard = null;
 
-const stations = [
-    {file:"01_BatInWar.mp3", title:"1. The Bat in the War"},
-    {file:"02_BearChipmunk.mp3", title:"2. The Bear and the Chipmunk"},
-    {file:"03_BearTwoFriends.mp3", title:"3. The Bear and the Two Friends"},
-    {file:"04_BoyRattlesnake.mp3", title:"4. The Boy and the Rattlesnake"},
-    {file:"05_ButterflyMonk.mp3", title:"5. The Butterfly and the Kind Monk"},
-    {file:"06_CamelThistle.mp3", title:"6. The Camel and the Thistle"},
-    {file:"07_CamelTent.mp3", title:"7. The Camel in the Tent"},
-    {file:"08_CatFox.mp3", title:"8. The Cat and the Fox"},
-    {file:"09_CrowPeacock.mp3", title:"9. The Crow and the Peacock"},
-    {file:"10_DeerAntlers.mp3", title:"10. The Deer and His Antlers"},
-    {file:"11_DogReflection.mp3", title:"11. The Dog and His Reflection"},
-    {file:"12_DogWolf.mp3", title:"12. The Dog and the Wolf"},
-    {file:"13_DogManger.mp3", title:"13. The Dog in the Manger"},
-    {file:"14_DonkeyLapdog.mp3", title:"14. The Donkey and the Lapdog"},
-    {file:"15_DonkeySalt.mp3", title:"15. The Donkey and the Salt"},
-    {file:"16_EagleArrow.mp3", title:"16. The Eagle and the Arrow"},
-    {file:"17_EagleBeetle.mp3", title:"17. The Eagle and the Beetle"},
-    {file:"18_EagleChicken.mp3", title:"18. The Eagle Who Thought He Was a Chicken"},
-    {file:"19_ElephantRope.mp3", title:"19. The Elephant and the Rope"},
-    {file:"20_FalconKing.mp3", title:"20. The Falcon and the King"},
-    {file:"21_FoxStork.mp3", title:"21. The Fox and the Stork"},
-    {file:"22_FoxTraitorRooster.mp3", title:"22. The Fox and the Traitor Rooster"},
-    {file:"23_FrogsWantedKing.mp3", title:"23. The Frogs Who Wanted a King"},
-    {file:"24_GooseGoldenEggs.mp3", title:"24. The Goose and the Golden Eggs"},
-    {file:"25_HeronFish.mp3", title:"25. The Heron and the Fish"},
-    {file:"26_HorseLoadedDonkey.mp3", title:"26. The Horse and the Loaded Donkey"},
-    {file:"27_HorseStagRider.mp3", title:"27. The Horse, the Stag, and the Rider"},
-    {file:"28_LazySwallow.mp3", title:"28. The Lazy Swallow and the Winter"},
-    {file:"29_LionCleverRabbit.mp3", title:"29. The Lion and the Clever Rabbit"},
-    {file:"30_LionMouse.mp3", title:"30. The Lion and the Mouse"},
-    {file:"31_LionPainting.mp3", title:"31. The Lion and the Painting"},
-    {file:"32_LionDonkeyFox.mp3", title:"32. The Lion, the Donkey, and the Fox"},
-    {file:"33_LionsDividedHerd.mp3", title:"33. The Lions and the Divided Herd"},
-    {file:"34_LittleBirdCow.mp3", title:"34. The Little Bird and the Cow"},
-    {file:"35_MiceWantedBell.mp3", title:"35. The Mice Who Wanted a Bell"},
-    {file:"36_MonkeyCrocodile.mp3", title:"36. The Monkey and the Crocodile"},
-    {file:"37_MouseFrogHawk.mp3", title:"37. The Mouse, the Frog, and the Hawk"},
-    {file:"38_NightingaleHawk.mp3", title:"38. The Nightingale and the Hawk"},
-    {file:"39_OakTreeReed.mp3", title:"39. The Oak Tree and the Reed"},
-    {file:"40_OldDogHole.mp3", title:"40. The Old Dog and the Hole"},
-    {file:"41_OldLionFootprints.mp3", title:"41. The Old Lion and the Footprints"},
-    {file:"42_OldManScorpion.mp3", title:"42. The Old Man and the Scorpion"},
-    {file:"43_PeacockCrane.mp3", title:"43. The Peacock and the Crane"},
-    {file:"44_WomanMongoose.mp3", title:"44. The Peasant Woman and the Mongoose"},
-    {file:"45_PeasantSnake.mp3", title:"45. The Peasant and the Snake"},
-    {file:"46_ScorpionFrog.mp3", title:"46. The Scorpion and the Frog"},
-    {file:"47_ElephantNoise.mp3", title:"47. The Silent Elephant and the Noise"},
-    {file:"48_SnakeFile.mp3", title:"48. The Snake and the Steel File"},
-    {file:"49_SpiderFly.mp3", title:"49. The Spider and the Flattered Fly"},
-    {file:"50_TigerFox.mp3", title:"50. The Tiger and the Smart Fox"},
-    {file:"51_TigerWoodpecker.mp3", title:"51. The Tiger and the Woodpecker"},
-    {file:"52_TurtleScorpion.mp3", title:"52. The Turtle and the Scorpion"},
-    {file:"53_TurtleGeese.mp3", title:"53. The Turtle and the Two Geese"},
-    {file:"54_TwoDogs.mp3", title:"54. The Two Dogs"},
-    {file:"55_TwoFrogsMilk.mp3", title:"55. The Two Frogs and the Milk"},
-    {file:"56_RoostersEagle.mp3", title:"56. The Two Roosters and the Eagle"},
-    {file:"57_TwoSeeds.mp3", title:"57. The Two Seeds"},
-    {file:"58_WarriorWolf.mp3", title:"58. The Warrior and the Loyal Wolf"},
-    {file:"59_WolfLamb.mp3", title:"59. The Wolf and the Lamb"},
-    {file:"60_WolfSheep.mp3", title:"60. The Wolf in Sheep’s Clothing"},
-    {file:"61_WoodcutterTrees.mp3", title:"61. The Woodcutter and the Trees"}
-];
-
 function renderGrid() {
     grid.innerHTML = "";
     stations.forEach((s, i) => {
@@ -93,7 +29,6 @@ function renderGrid() {
 }
 renderGrid();
 
-// --- BACK BUTTON FIX (NO RELOAD) ---
 document.getElementById('btn-back').onclick = () => {
     audio.pause(); audio.currentTime = 0;
     playerZone.classList.add('hidden');
@@ -103,11 +38,16 @@ document.getElementById('btn-back').onclick = () => {
     currentQ = 0; attempts = 0;
 };
 
+// --- CORRECTED VIEW COMIC LOGIC ---
 document.getElementById('btn-comic').onclick = () => {
     const currentFile = audio.src.split('/').pop();
     const station = stations.find(s => s.file === decodeURIComponent(currentFile));
+    
     if (station) {
-        const imageName = station.title.replace(/^\d+\.\s*/, "") + ".png";
+        // If an explicit image name is provided in data.js, use it.
+        // Otherwise, fallback to the default title formatting logic.
+        const imageName = station.image || (station.title.replace(/^\d+\.\s*/, "") + ".png");
+        
         comicImg.src = imageName;
         comicModal.classList.remove('hidden');
         resetZoom();
@@ -258,7 +198,7 @@ function finishQuiz() {
         completedLessons.push(fn); 
         localStorage.setItem('completedFablesLessons', JSON.stringify(completedLessons)); 
     }
-    renderGrid(); // Refresh grid to show checkmark
+    renderGrid();
     feedbackArea.innerHTML = `<h1 style="color:#ccff00; font-size: 60px;">FINISHED!</h1><h2 style="font-size: 40px;">QUIZ SCORE: ${totalScore}</h2><button id="btn-done" class="action-btn-large">SAVE & RETURN</button>`;
     document.getElementById('btn-done').onclick = () => {
         playerZone.classList.add('hidden');
