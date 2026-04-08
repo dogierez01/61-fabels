@@ -44,8 +44,8 @@ document.getElementById('btn-comic').onclick = () => {
     const station = stations.find(s => s.file === decodeURIComponent(currentFile));
     
     if (station) {
-        // If an explicit image name is provided in data.js, use it.
-        // Otherwise, fallback to the default title formatting logic.
+        // This will check if there is an explicit image name in data.js
+        // If there isn't, it falls back to parsing the title.
         const imageName = station.image || (station.title.replace(/^\d+\.\s*/, "") + ".png");
         
         comicImg.src = imageName;
