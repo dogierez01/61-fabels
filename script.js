@@ -8,7 +8,15 @@ const splash = document.getElementById('splash-screen'), instr = document.getEle
       modalClose = document.getElementById('modal-close'), zoomContainer = document.getElementById('zoom-container');
 
 let lifetimeScore = parseInt(localStorage.getItem('fablesScore')) || 0;
-let completedLessons = JSON.parse(localStorage.getItem('completedFablesLessons')) || [];
+let completedLessons = [];
+
+// Safely load local storage to prevent crashing
+try {
+    completedLessons = JSON.parse(localStorage.getItem('completedFablesLessons')) || [];
+} catch (e) {
+    completedLessons = [];
+}
+
 if(ptsVal) ptsVal.innerText = lifetimeScore;
 
 let wordBucket = []; let currentQ = 0; let attempts = 0; let totalScore = 0; let firstCard = null;
