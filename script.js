@@ -34,7 +34,12 @@ function renderGrid() {
         grid.appendChild(btn);
     });
 }
-renderGrid();
+
+if (typeof stations !== 'undefined') {
+    renderGrid();
+} else {
+    alert("CRITICAL ERROR: data.js is broken or cut off. Please restore your original working data.js file.");
+}
 
 document.getElementById('btn-back').onclick = () => {
     audio.pause(); audio.currentTime = 0;
@@ -45,12 +50,20 @@ document.getElementById('btn-back').onclick = () => {
     currentQ = 0; attempts = 0;
 };
 
+// --- IMAGE FIXES ---
 document.getElementById('btn-comic').onclick = () => {
     const currentFile = decodeURIComponent(audio.src.split('/').pop());
+    
+    if (typeof stations === 'undefined') return;
     const station = stations.find(s => s.file === currentFile);
     
     if (station) {
-        const imageName = station.image || (station.title.replace(/^\d+\.\s*/, "") + ".png");
+        let imageName = station.title.replace(/^\d+\.\s*/, "") + ".png";
+        
+        if (station.file === "07_CamelTent.mp3") imageName = "The Camel and the Tent.png";
+        if (station.file === "09_CrowPeacock.mp3") imageName = "The Crow and the Peacock Feathers.png";
+        if (station.file === "60_WolfSheep.mp3") imageName = "The Wolf in Sheep's Clothing.png";
+        
         comicImg.src = imageName;
         comicModal.classList.remove('hidden');
         resetZoom();
@@ -59,7 +72,7 @@ document.getElementById('btn-comic').onclick = () => {
 
 modalClose.onclick = () => { comicModal.classList.add('hidden'); };
 
-// --- NEW ZOOM AND PAN LOGIC ---
+// --- ZOOM AND PAN LOGIC ---
 let scale = 1, lastScale = 1, startDist = 0;
 let translateX = 0, translateY = 0, lastTranslateX = 0, lastTranslateY = 0;
 let startX = 0, startY = 0;
@@ -96,7 +109,6 @@ function resetZoom() {
     translateX = 0; translateY = 0; lastTranslateX = 0; lastTranslateY = 0;
     comicImg.style.transform = `translate(0px, 0px) scale(1)`;
 }
-// --- END NEW ZOOM AND PAN LOGIC ---
 
 document.getElementById('btn-start').onclick = () => { splash.classList.add('hidden'); instr.classList.remove('hidden'); };
 document.getElementById('btn-enter').onclick = () => { instr.classList.add('hidden'); app.classList.remove('hidden'); };
@@ -161,20 +173,26 @@ document.getElementById('btn-bowling').onclick = () => {
     runQuiz(lesson);
 };
 
+// --- NEW TRUE/FALSE QUIZ LOGIC ---
 function runQuiz(lesson) {
     if (currentQ >= 7) { finishQuiz(); return; }
     const qData = lesson.questions[currentQ];
     const storyNum = parseInt(decodeURIComponent(audio.src.split('/').pop()).substring(0,2));
+    
+    // New UI with True/False buttons
     feedbackArea.innerHTML = `
         <div id="quiz-container">
             <div class="score-badge">SCORE: ${totalScore} | Q: ${currentQ+1}/7</div>
             <button id="btn-hear-q" class="mode-btn neon-green">👂 LISTEN TO QUESTION</button>
-            <div id="mic-box" class="hidden" style="margin-top:20px;">
-                <button id="btn-speak" class="mic-btn">🎤</button>
-                <p id="mic-status" style="color:#666; font-weight:bold;">Ready...</p>
+            
+            <div id="tf-box" class="hidden" style="margin-top:20px; display: flex; gap: 15px; justify-content: center;">
+                <button id="btn-true" class="action-btn-large" style="background-color: #39ff14; color: black; min-width: 120px;">TRUE</button>
+                <button id="btn-false" class="action-btn-large" style="background-color: #ff0055; color: white; min-width: 120px;">FALSE</button>
             </div>
+            
             <div id="res-area"></div>
         </div>`;
+
     document.getElementById('btn-hear-q').onclick = () => {
         const utter = new SpeechSynthesisUtterance(qData.q);
         utter.lang = 'en-US';
@@ -183,40 +201,48 @@ function runQuiz(lesson) {
             let v = voices.find(v => (v.name.includes(storyNum % 2 !== 0 ? "Female" : "Male")) && v.lang.startsWith('en'));
             utter.voice = v || voices.find(v => v.lang.startsWith('en')) || voices[0];
         }
-        utter.onend = () => { document.getElementById('mic-box').classList.remove('hidden'); };
+        
+        // Show True/False buttons after audio finishes
+        utter.onend = () => { document.getElementById('tf-box').classList.remove('hidden'); };
         window.speechSynthesis.speak(utter);
     };
-    document.getElementById('btn-speak').onclick = function() {
-        const btn = this; const status = document.getElementById('mic-status');
-        window.currentRec = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
-        window.currentRec.lang = 'en-US';
-        window.currentRec.onstart = () => { btn.classList.add('active'); status.innerText = "Listening..."; };
-        window.currentRec.onresult = (e) => {
-            document.getElementById('mic-box').classList.add('hidden'); 
-            const res = e.results[0][0].transcript.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
-            const ans = qData.a_en.toLowerCase().trim().replace(/[^a-z0-9]/g, "");
-            if (res === ans) {
-                let pts = (attempts === 0) ? 20 : 15; totalScore += pts;
-                showResult(true, pts === 20 ? "STRIKE! (+20)" : "SPARE! (+15)", qData, lesson);
-            } else {
-                attempts++;
-                if (attempts === 1) showResult(false, "MISS! TRY AGAIN", qData, lesson, true);
-                else showResult(false, "MISS! (0 pts)", qData, lesson, false);
-            }
-        };
-        window.currentRec.start();
-    };
+
+    // Central function to check the answer
+    function checkAnswer(userChoiceIsTrue) {
+        document.getElementById('tf-box').classList.add('hidden');
+        
+        // The data.js uses "Yes" or "No". We convert that to true/false logic.
+        const correctAnswerIsTrue = qData.a_en.toLowerCase().includes("yes");
+        
+        if (userChoiceIsTrue === correctAnswerIsTrue) {
+            let pts = (attempts === 0) ? 20 : 15; 
+            totalScore += pts;
+            showResult(true, pts === 20 ? "STRIKE! (+20)" : "SPARE! (+15)", qData, lesson);
+        } else {
+            attempts++;
+            if (attempts === 1) showResult(false, "MISS! TRY AGAIN", qData, lesson, true);
+            else showResult(false, "MISS! (0 pts)", qData, lesson, false);
+        }
+    }
+
+    // Attach logic to the new buttons
+    document.getElementById('btn-true').onclick = () => checkAnswer(true);
+    document.getElementById('btn-false').onclick = () => checkAnswer(false);
 }
 
 function showResult(isCorrect, msg, qData, lesson, canRetry = false) {
     const area = document.getElementById('res-area');
     area.innerHTML = `<h1 style="color:${isCorrect?'#39ff14':'#f44'}; font-size: 50px;">${msg}</h1>`;
+    
     if (isCorrect || !canRetry) {
         area.innerHTML += `<p class="quiz-q-text">Q: ${qData.q}</p><p class="quiz-a-text">EN: ${qData.a_en}</p><p style="color:#888; font-size:30px; font-weight: bold;">TR: ${qData.a_tr}</p><button id="btn-nxt" class="action-btn-large">NEXT QUESTION ⮕</button>`;
         document.getElementById('btn-nxt').onclick = () => { currentQ++; attempts = 0; runQuiz(lesson); };
     } else {
         area.innerHTML += `<button id="btn-retry" class="action-btn-large">RETRY FOR SPARE</button>`;
-        document.getElementById('btn-retry').onclick = () => { area.innerHTML = ""; document.getElementById('mic-box').classList.remove('hidden'); document.getElementById('btn-speak').classList.remove('active'); };
+        document.getElementById('btn-retry').onclick = () => { 
+            area.innerHTML = ""; 
+            document.getElementById('tf-box').classList.remove('hidden'); 
+        };
     }
 }
 
