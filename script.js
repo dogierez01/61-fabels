@@ -10,7 +10,6 @@ const splash = document.getElementById('splash-screen'), instr = document.getEle
 let lifetimeScore = parseInt(localStorage.getItem('fablesScore')) || 0;
 let completedLessons = [];
 
-// Safely load local storage to prevent crashing
 try {
     completedLessons = JSON.parse(localStorage.getItem('completedFablesLessons')) || [];
 } catch (e) {
@@ -47,8 +46,8 @@ document.getElementById('btn-back').onclick = () => {
 };
 
 document.getElementById('btn-comic').onclick = () => {
-    const currentFile = audio.src.split('/').pop();
-    const station = stations.find(s => s.file === decodeURIComponent(currentFile));
+    const currentFile = decodeURIComponent(audio.src.split('/').pop());
+    const station = stations.find(s => s.file === currentFile);
     
     if (station) {
         const imageName = station.image || (station.title.replace(/^\d+\.\s*/, "") + ".png");
